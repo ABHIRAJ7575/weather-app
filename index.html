@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-title">
+                <h1>⛅ Weather Dashboard</h1>
+                <p>Real-time updates & 5-day forecasts</p>
+            </div>
+            <div class="header-controls">
+                <div class="unit-switch">
+                    <button id="unit-toggle-c" class="unit-btn active" data-unit="metric">°C</button>
+                    <button id="unit-toggle-f" class="unit-btn" data-unit="imperial">°F</button>
+                </div>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="theme-toggle">
+                        <input type="checkbox" id="theme-toggle" />
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="city-input" placeholder="Search for a city..." />
+                <div class="button-group">
+                    <button id="search-btn">🔍 Search</button>
+                    <button id="location-btn">📍 My Location</button>
+                </div>
+            </div>
+            <div class="quick-cities">
+                <div class="city-chip" data-city="Mumbai">Mumbai</div>
+                <div class="city-chip" data-city="Delhi">Delhi</div>
+                <div class="city-chip" data-city="London">London</div>
+                <div class="city-chip" data-city="New York">New York</div>
+                <div class="city-chip" data-city="Tokyo">Tokyo</div>
+                <div class="city-chip" data-city="Paris">Paris</div>
+            </div>
+        </div>
+
+        <div class="error-message" id="error-message"></div>
+
+        <div id="content-area" class="hidden">
+            <div class="main-content">
+                <div class="weather-card current-weather">
+                    <div class="city-name" id="city-name"></div>
+                    <div class="current-date" id="current-date"></div>
+                    <img src="" alt="weather icon" class="weather-icon-large" id="weather-icon" />
+                    <div class="temperature-large" id="temperature"></div>
+                    <div class="description-large" id="description"></div>
+                    <div class="temp-range">
+                        <div>↑ <span id="temp-max"></span></div>
+                        <div>↓ <span id="temp-min"></span></div>
+                    </div>
+                </div>
+
+                <div class="weather-card">
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <div class="detail-icon">💧</div>
+                            <div class="detail-label">Humidity</div>
+                            <div class="detail-value" id="humidity"></div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-icon">💨</div>
+                            <div class="detail-label">Wind Speed</div>
+                            <div class="detail-value" id="wind-speed"></div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-icon">🌡️</div>
+                            <div class="detail-label">Feels Like</div>
+                            <div class="detail-value" id="feels-like"></div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-icon">🔽</div>
+                            <div class="detail-label">Pressure</div>
+                            <div class="detail-value" id="pressure"></div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-icon">👁️</div>
+                            <div class="detail-label">Visibility</div>
+                            <div class="detail-value" id="visibility"></div>
+                        </div>
+                        <div class="detail-card sunrise-sunset">
+                            <div class="sunrise-sunset-item">
+                                <div class="detail-icon">🌅</div>
+                                <div class="detail-label">Sunrise</div>
+                                <div class="detail-value" id="sunrise"></div>
+                            </div>
+                            <div class="sunrise-sunset-item">
+                                <div class="detail-icon">🌇</div>
+                                <div class="detail-label">Sunset</div>
+                                <div class="detail-value" id="sunset"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hourly-forecast-section" id="hourly-forecast-section">
+                <div class="forecast-title">Hourly Forecast</div>
+                <div class="hourly-forecast-grid" id="hourly-forecast-grid"></div>
+            </div>
+
+            <div class="forecast-section">
+                <div class="forecast-title">5-Day Forecast</div>
+                <div class="forecast-grid" id="forecast-grid"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
