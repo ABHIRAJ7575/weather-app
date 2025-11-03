@@ -2,6 +2,372 @@ const API_KEY = '487cf4338e8745157083ffae57e17ff2'; // Keep your API key
 const WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
 const FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
 
+// Weather condition mapping configuration
+const WEATHER_CONDITION_MAP = {
+    'Clear': 'clouds',
+    'Clouds': 'clouds',
+    'Rain': 'rain',
+    'Drizzle': 'rain',
+    'Thunderstorm': 'thunderstorm',
+    'Snow': 'snow',
+    'Mist': 'clouds',
+    'Fog': 'clouds',
+    'Haze': 'clouds',
+    'Smoke': 'clouds',
+    'Dust': 'clouds',
+    'Sand': 'clouds',
+    'Ash': 'clouds',
+    'Squall': 'thunderstorm',
+    'Tornado': 'thunderstorm'
+};
+
+// Weather Animation Controller
+class WeatherAnimationController {
+    constructor() {
+        this.animationLayer = null;
+        this.currentAnimation = null;
+        this.animationElements = [];
+        this.lightningInterval = null;
+        this.prefersReducedMotion = false;
+        
+        // Performance monitoring
+        this.performanceMonitoring = {
+            enabled: true,
+            frameCount: 0,
+            lastTime: performance.now(),
+            fps: 60,
+            fpsHistory: [],
+            monitoringInterval: null
+        };
+        
+        // Dynamic element count based on performance
+        this.elementCounts = {
+            rain: 80,
+            snow: 50,
+            clouds: 5,
+            thunderstorm: 100
+        };
+    }
+
+    initialize() {
+        // Get animation layer element
+        this.animationLayer = document.getElementById('weather-animation-layer');
+        
+        if (!this.animationLayer) {
+            console.error('Animation layer element not found');
+            return;
+        }
+
+        // Check for prefers-reduced-motion
+        this.respectMotionPreference();
+        
+        // Listen for changes to motion preference
+        const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        motionQuery.addEventListener('change', () => {
+            this.respectMotionPreference();
+        });
+        
+        // Start performance monitoring
+        this.startPerformanceMonitoring();
+    }
+
+    updateAnimation(weatherCondition) {
+        // Clear existing animations first
+        this.clearAnimations();
+        
+        // Don't create animations if user prefers reduced motion
+        if (this.prefersReducedMotion) {
+            return;
+        }
+
+        // Store current animation type
+        this.currentAnimation = weatherCondition;
+        
+        // Create appropriate animation based on weather condition
+        switch(weatherCondition) {
+            case 'rain':
+                this.createRainAnimation();
+                break;
+            case 'snow':
+                this.createSnowAnimation();
+                break;
+            case 'clouds':
+                this.createCloudAnimation();
+                break;
+            case 'thunderstorm':
+                this.createThunderstormAnimation();
+                break;
+            default:
+                console.log(`Animation updated to: ${weatherCondition}`);
+        }
+    }
+
+    createRainAnimation() {
+        // Generate raindrop elements (dynamic count based on performance)
+        for (let i = 0; i < this.elementCounts.rain; i++) {
+            const raindrop = document.createElement('div');
+            raindrop.className = 'raindrop';
+            
+            // Random horizontal position
+            const leftPosition = Math.random() * 100;
+            raindrop.style.left = `${leftPosition}%`;
+            
+            // Random animation duration between 0.5s and 1.5s
+            const duration = 0.5 + Math.random() * 1.0;
+            raindrop.style.animationDuration = `${duration}s`;
+            
+            // Random animation delay for staggered effect
+            const delay = Math.random() * 2;
+            raindrop.style.animationDelay = `${delay}s`;
+            
+            // Append to animation layer
+            this.animationLayer.appendChild(raindrop);
+            this.animationElements.push(raindrop);
+        }
+    }
+
+    createSnowAnimation() {
+        // Unicode snowflake characters
+        const snowflakeChars = ['❄', '❅', '❆'];
+        const sizes = ['small', 'medium', 'large'];
+        
+        // Generate snowflake elements (dynamic count based on performance)
+        for (let i = 0; i < this.elementCounts.snow; i++) {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            
+            // Random snowflake character
+            const char = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+            snowflake.textContent = char;
+            
+            // Random size variation
+            const size = sizes[Math.floor(Math.random() * sizes.length)];
+            snowflake.classList.add(size);
+            
+            // Random horizontal position
+            const leftPosition = Math.random() * 100;
+            snowflake.style.left = `${leftPosition}%`;
+            
+            // Random animation duration between 3s and 8s for snowfall
+            const fallDuration = 3 + Math.random() * 5;
+            snowflake.style.setProperty('animation-duration', `${fallDuration}s, ${fallDuration * 0.5}s`);
+            
+            // Random animation delay for staggered effect
+            const delay = Math.random() * 5;
+            snowflake.style.animationDelay = `${delay}s`;
+            
+            // Append to animation layer
+            this.animationLayer.appendChild(snowflake);
+            this.animationElements.push(snowflake);
+        }
+    }
+
+    createCloudAnimation() {
+        const sizes = ['small', 'medium', 'large'];
+        
+        // Generate 5 cloud elements with varying sizes
+        for (let i = 0; i < 5; i++) {
+            const cloud = document.createElement('div');
+            cloud.className = 'cloud';
+            
+            // Assign size variation
+            const size = sizes[i % sizes.length];
+            cloud.classList.add(size);
+            
+            // Random vertical position (between 10% and 60% of viewport height)
+            const topPosition = 10 + Math.random() * 50;
+            cloud.style.top = `${topPosition}%`;
+            
+            // Random animation duration between 20s and 40s for parallax effect
+            // Smaller clouds move faster, larger clouds move slower
+            let duration;
+            if (size === 'small') {
+                duration = 20 + Math.random() * 10; // 20-30s
+            } else if (size === 'medium') {
+                duration = 25 + Math.random() * 10; // 25-35s
+            } else {
+                duration = 30 + Math.random() * 10; // 30-40s
+            }
+            cloud.style.animationDuration = `${duration}s`;
+            
+            // Random animation delay for staggered start
+            const delay = Math.random() * 10;
+            cloud.style.animationDelay = `${delay}s`;
+            
+            // Append to animation layer
+            this.animationLayer.appendChild(cloud);
+            this.animationElements.push(cloud);
+        }
+    }
+
+    createThunderstormAnimation() {
+        // Reuse rain animation with increased element count (dynamic based on performance)
+        for (let i = 0; i < this.elementCounts.thunderstorm; i++) {
+            const raindrop = document.createElement('div');
+            raindrop.className = 'raindrop';
+            
+            // Random horizontal position
+            const leftPosition = Math.random() * 100;
+            raindrop.style.left = `${leftPosition}%`;
+            
+            // Random animation duration between 0.5s and 1.5s
+            const duration = 0.5 + Math.random() * 1.0;
+            raindrop.style.animationDuration = `${duration}s`;
+            
+            // Random animation delay for staggered effect
+            const delay = Math.random() * 2;
+            raindrop.style.animationDelay = `${delay}s`;
+            
+            // Append to animation layer
+            this.animationLayer.appendChild(raindrop);
+            this.animationElements.push(raindrop);
+        }
+        
+        // Create lightning flash element
+        const lightningFlash = document.createElement('div');
+        lightningFlash.className = 'lightning-flash';
+        lightningFlash.style.opacity = '0';
+        document.body.appendChild(lightningFlash);
+        this.animationElements.push(lightningFlash);
+        
+        // Set up random interval for lightning triggers (3-8 seconds)
+        const triggerLightning = () => {
+            // Remove existing animation class if any
+            lightningFlash.style.animation = 'none';
+            
+            // Force reflow to restart animation
+            void lightningFlash.offsetWidth;
+            
+            // Apply flash animation
+            lightningFlash.style.animation = 'flash 0.3s ease-out';
+            
+            // Schedule next lightning
+            const nextDelay = 3000 + Math.random() * 5000; // 3-8 seconds
+            this.lightningInterval = setTimeout(triggerLightning, nextDelay);
+        };
+        
+        // Start first lightning after initial delay
+        const initialDelay = 2000 + Math.random() * 3000; // 2-5 seconds
+        this.lightningInterval = setTimeout(triggerLightning, initialDelay);
+    }
+
+    clearAnimations() {
+        // Remove all animation elements
+        this.animationElements.forEach(element => {
+            if (element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
+        });
+        
+        // Clear the animation layer
+        if (this.animationLayer) {
+            this.animationLayer.innerHTML = '';
+        }
+        
+        // Clear animation elements array
+        this.animationElements = [];
+        
+        // Clear any timeouts/intervals (for lightning effects)
+        if (this.lightningInterval) {
+            clearTimeout(this.lightningInterval);
+            this.lightningInterval = null;
+        }
+        
+        // Reset current animation
+        this.currentAnimation = null;
+    }
+
+    respectMotionPreference() {
+        // Check if user prefers reduced motion
+        const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        this.prefersReducedMotion = motionQuery.matches;
+        
+        if (this.prefersReducedMotion && this.animationLayer) {
+            // Reduce opacity and clear animations
+            this.animationLayer.style.opacity = '0.2';
+            this.clearAnimations();
+            // Stop performance monitoring when animations are disabled
+            this.stopPerformanceMonitoring();
+        } else if (this.animationLayer) {
+            // Restore normal opacity
+            this.animationLayer.style.opacity = '0.6';
+            // Restart performance monitoring
+            if (!this.performanceMonitoring.monitoringInterval) {
+                this.startPerformanceMonitoring();
+            }
+        }
+    }
+    
+    startPerformanceMonitoring() {
+        if (!this.performanceMonitoring.enabled || this.prefersReducedMotion) {
+            return;
+        }
+        
+        // Monitor frame rate using requestAnimationFrame
+        const measureFPS = () => {
+            const currentTime = performance.now();
+            const deltaTime = currentTime - this.performanceMonitoring.lastTime;
+            
+            this.performanceMonitoring.frameCount++;
+            
+            // Calculate FPS every second
+            if (deltaTime >= 1000) {
+                const fps = Math.round((this.performanceMonitoring.frameCount * 1000) / deltaTime);
+                this.performanceMonitoring.fps = fps;
+                this.performanceMonitoring.fpsHistory.push(fps);
+                
+                // Keep only last 10 FPS measurements
+                if (this.performanceMonitoring.fpsHistory.length > 10) {
+                    this.performanceMonitoring.fpsHistory.shift();
+                }
+                
+                // Calculate average FPS
+                const avgFPS = this.performanceMonitoring.fpsHistory.reduce((a, b) => a + b, 0) / 
+                               this.performanceMonitoring.fpsHistory.length;
+                
+                // If average FPS drops below 50, reduce element count
+                if (avgFPS < 50 && this.currentAnimation) {
+                    this.reduceElementCount();
+                }
+                
+                // Reset counters
+                this.performanceMonitoring.frameCount = 0;
+                this.performanceMonitoring.lastTime = currentTime;
+            }
+            
+            // Continue monitoring
+            if (this.performanceMonitoring.enabled) {
+                requestAnimationFrame(measureFPS);
+            }
+        };
+        
+        // Start the monitoring loop
+        this.performanceMonitoring.lastTime = performance.now();
+        requestAnimationFrame(measureFPS);
+    }
+    
+    stopPerformanceMonitoring() {
+        this.performanceMonitoring.enabled = false;
+        this.performanceMonitoring.frameCount = 0;
+        this.performanceMonitoring.fpsHistory = [];
+    }
+    
+    reduceElementCount() {
+        // Reduce element counts by 30%
+        this.elementCounts.rain = Math.max(30, Math.floor(this.elementCounts.rain * 0.7));
+        this.elementCounts.snow = Math.max(20, Math.floor(this.elementCounts.snow * 0.7));
+        this.elementCounts.thunderstorm = Math.max(40, Math.floor(this.elementCounts.thunderstorm * 0.7));
+        
+        // Re-create current animation with reduced element count
+        if (this.currentAnimation) {
+            const currentType = this.currentAnimation;
+            this.updateAnimation(currentType);
+        }
+        
+        console.log('Performance optimization: Reduced animation element count', this.elementCounts);
+    }
+}
+
 // DOM Elements
 const cityInput = document.getElementById('city-input');
 const searchBtn = document.getElementById('search-btn');
@@ -19,6 +385,9 @@ let lastSearchType = 'city';
 let lastSearchData = 'Mumbai';
 let currentWeatherData = null;
 let currentForecastData = null;
+
+// Initialize Animation Controller
+const animationController = new WeatherAnimationController();
 
 // --- Event Listeners ---
 
@@ -66,6 +435,9 @@ window.addEventListener('load', () => {
     
     // Initialize Units
     updateUnitButtons();
+    
+    // Initialize Animation Controller
+    animationController.initialize();
     
     // Load default weather
     getWeatherByCity(lastSearchData);
@@ -209,6 +581,11 @@ function displayWeather(weather, forecast) {
     contentArea.classList.remove('hidden');
     hourlySection.classList.remove('hidden');
     updateBackground(weatherInfo[0].main);
+    
+    // Update weather animations based on current condition
+    const weatherCondition = weatherInfo[0].main;
+    const animationType = WEATHER_CONDITION_MAP[weatherCondition] || 'clouds';
+    animationController.updateAnimation(animationType);
 }
 
 function displayHourlyForecast(data) {
